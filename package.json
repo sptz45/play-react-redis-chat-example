@@ -1,0 +1,28 @@
+{
+  "name": "play-react-redis-chat-example",
+  "version": "0.1.0",
+  "description": "My chat application",
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/sptz45/play-react-redis-chat-example.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Spiros Tzavellas",
+  "license": "Apache APL",
+  "dependencies": {
+    "classnames": "^1.1.4",
+    "moment": "^2.9.0",
+    "react": "^0.12.2",
+    "whatwg-fetch": "^0.7.0"
+  },
+  "devDependencies": {
+    "browser-sync": "^2.0.1",
+    "gulp": "^3.8.11",
+    "gulp-browserify": "^0.5.1",
+    "gulp-less": "^3.0.0",
+    "gulp-react": "^2.0.0",
+    "reactify": "^1.0.0"
+  }
+}

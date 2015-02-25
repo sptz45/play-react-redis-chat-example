@@ -1,0 +1,12 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# Home page
+POST        /create                controllers.Application.create(username)
+GET         /chat/:chatRoom/:user  controllers.Application.chat(chatRoom, user)
+GET         /                      controllers.Application.index
+GET         /:chatRoom             controllers.Application.index2(chatRoom)
+
+# Map static resources from the /public folder to the /assets URL path
+GET         /assets/*file          controllers.Assets.at(path="/public", file)
