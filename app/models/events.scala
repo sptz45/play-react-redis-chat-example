@@ -4,9 +4,9 @@ package events {
 
   import play.api.libs.json._
   import play.api.mvc.WebSocket.FrameFormatter
-import scredis.serialization.{UTF8StringWriter, Writer}
+  import scredis.serialization.{UTF8StringWriter, Writer}
 
-sealed  trait InEvent
+  sealed  trait InEvent
   case object JoinGroup extends InEvent
   case object LeaveGroup extends InEvent
   case class SendMessage(message: String) extends InEvent
