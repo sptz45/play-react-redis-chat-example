@@ -6,7 +6,7 @@ import play.api.libs.json.Json
 case class User(username: String, lastAccess: Long, status: String)
 
 object User {
-  implicit val json = Json.format[User]
+  implicit val jsonFormatter = Json.format[User]
 }
 
 object UserStatus {
