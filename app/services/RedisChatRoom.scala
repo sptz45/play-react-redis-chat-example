@@ -11,8 +11,8 @@ class RedisChatRoom(redis: Redis, roomId: RoomId) extends ChatRoom {
   import redis.dispatcher
 
   def history: Seq[Future[OutEvent]] = {
-    val newUsers = users.map(users => NewMembers(users.toArray))
-    val newMessages = messages.map(messages => NewMessages(messages.toArray))
+    val newUsers = users.map(users => NewMembers(users.toSeq))
+    val newMessages = messages.map(messages => NewMessages(messages.toSeq))
     Seq(newUsers, newMessages)
   }
 

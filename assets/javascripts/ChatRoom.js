@@ -112,12 +112,12 @@ var serverChannel = null;
 var ChatRoom = React.createClass({
 
     join: function() {
-        var event = { event: 'join' };
+        var event = { event: 'JoinGroup' };
         serverChannel.send(event);
     },
 
     addMessage: function(message) {
-        serverChannel.send({ event: 'new_message', message: message });
+        serverChannel.send({ event: 'SendMessage', message: message });
     },
 
     receiveMessages: function(newMessages) {
@@ -148,7 +148,7 @@ var ChatRoom = React.createClass({
         this.userActivityTimestamp = new Date().getTime();
         if (this.state.userStatus !== 'online') {
             this.setState({ userStatus: 'online' });
-            serverChannel.send({ event: 'user_activity' });
+            serverChannel.send({ event: 'UserActivity' });
         }
     },
 
@@ -159,11 +159,11 @@ var ChatRoom = React.createClass({
             var now = new Date().getTime();
             if (now - this.userActivityTimestamp > timeout) {
                 if (this.state.userStatus === 'online') {
-                    serverChannel.send({event: 'user_away', lastAccessTime: this.userActivityTimestamp});
+                    serverChannel.send({event: 'UserWentAway', lastAccessTime: this.userActivityTimestamp});
                     this.setState({ userStatus: 'away' });
                 }
             } else {
-                serverChannel.send({ event: 'user_activity' });
+                serverChannel.send({ event: 'UserActivity' });
             }
         }.bind(this), timeout);
     },
@@ -174,13 +174,13 @@ var ChatRoom = React.createClass({
 
     componentDidMount: function() {
         serverChannel = ServerChannel(this.props.roomId, this.props.username);
-        serverChannel.setEventCallback('new_messages', function(data) {
+        serverChannel.setEventCallback('NewMessages', function(data) {
             this.receiveMessages(data.messages);
         }.bind(this));
-        serverChannel.setEventCallback('new_members', function(data) {
+        serverChannel.setEventCallback('NewMembers', function(data) {
             this.receiveMembers(data.members);
         }.bind(this));
-        serverChannel.setEventCallback('member_status', function(data) {
+        serverChannel.setEventCallback('MemberStatusUpdate', function(data) {
             this.updateMemberStatus(data.member);
         }.bind(this));
         serverChannel.onReady(this.join);
