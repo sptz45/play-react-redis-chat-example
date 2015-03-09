@@ -4,6 +4,12 @@ var React = require('react'),
     classNames = require('classnames');
 
 var UserList = React.createClass({
+
+    propTypes: {
+        users: React.PropTypes.array.isRequired,
+        currentUser: React.PropTypes.string.isRequired
+    },
+
    render: function() {
        var userNodes = this.props.users.map(function(user) {
            var classes = classNames('user-' + user.status, {'currentUser': this.props.currentUser === user.username});
@@ -28,6 +34,11 @@ var UserList = React.createClass({
 });
 
 var MessageList = React.createClass({
+
+    propTypes: {
+        messages: React.PropTypes.array.isRequired
+    },
+
     render: function() {
         var messageNodes = this.props.messages.map(function(msg) {
             return (
@@ -49,6 +60,10 @@ var MessageList = React.createClass({
 });
 
 var ChatInput = React.createClass({
+
+    propTypes: {
+        onNewMessage: React.PropTypes.func.isRequired
+    },
 
     onNewMessage: function(event) {
         event.preventDefault();
@@ -110,6 +125,11 @@ var serverChannel = null;
 
 
 var ChatRoom = React.createClass({
+
+    propTypes: {
+        username: React.PropTypes.string.isRequired,
+        roomId: React.PropTypes.string.isRequired
+    },
 
     join: function() {
         var event = { event: 'JoinGroup' };

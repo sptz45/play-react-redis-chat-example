@@ -4,6 +4,10 @@ var Fetch = require('whatwg-fetch');
 
 var Menu = React.createClass({
 
+    propTypes: {
+        onNavigate: React.PropTypes.func.isRequired
+    },
+
     joinChat: function() {
         this.props.onNavigate('join');
     },
@@ -24,6 +28,12 @@ var Menu = React.createClass({
 });
 
 var JoinMenu = React.createClass({
+
+    propTypes: {
+        router: React.PropTypes.object.isRequired,
+        roomId: React.PropTypes.string.isRequired,
+        onBack: React.PropTypes.func.isRequired
+    },
 
     handleSubmit: function(event) {
         event.preventDefault();
@@ -64,6 +74,11 @@ var JoinMenu = React.createClass({
 
 var CreateMenu = React.createClass({
 
+    propTypes: {
+        router: React.PropTypes.object.isRequired,
+        onBack: React.PropTypes.func.isRequired
+    },
+
     handleSubmit: function(event) {
         event.preventDefault();
         var username = this.refs.username.getDOMNode().value.trim();
@@ -101,6 +116,11 @@ var CreateMenu = React.createClass({
 });
 
 var Homepage = React.createClass({
+
+    propTypes: {
+        router: React.PropTypes.object.isRequired,
+        roomId: React.PropTypes.string
+    },
 
     getInitialState: function() {
         var action = this.props.roomId ? 'join' : 'welcome';
