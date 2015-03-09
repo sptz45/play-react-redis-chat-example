@@ -1,7 +1,11 @@
 
 var React = require('react'),
     moment = require('moment'),
-    classNames = require('classnames');
+    classNames = require('classnames'),
+    ChatActions = require('../actions/ChatActions'),
+    UserActions = require('../actions/UserActions'),
+    ChatStore = require('../stores/ChatStore'),
+    UserActivityStore = require('../stores/UserActivityStore');
 
 var UserList = React.createClass({
 
@@ -86,44 +90,6 @@ var ChatInput = React.createClass({
     }
 });
 
-var ServerChannel = function(roomId, username) {
-
-    var socket = new WebSocket('ws://'+window.location.hostname+':'+window.location.port+'/chat/'+roomId+'/'+username);
-    var callbacks = {};
-
-    socket.onopen = function() {
-        console.log('we are open');
-    };
-
-    socket.onerror = function(error) {
-        console.log('An error occurred: '+ error);
-    };
-
-    socket.onmessage = function(msg) {
-        var data = JSON.parse(msg.data);
-        var callback = callbacks[data.event];
-        if (callback) { callback(data); }
-    };
-
-    return {
-        send: function(msg) {
-            socket.send(JSON.stringify(msg));
-        },
-        setEventCallback: function(event, callback) {
-            callbacks[event] = callback;
-        },
-        onReady: function(callback) {
-            socket.onopen = callback;
-        },
-        close: function() {
-            socket.close();
-        }
-    };
-};
-
-var serverChannel = null;
-
-
 var ChatRoom = React.createClass({
 
     propTypes: {
@@ -131,35 +97,8 @@ var ChatRoom = React.createClass({
         roomId: React.PropTypes.string.isRequired
     },
 
-    join: function() {
-        var event = { event: 'JoinGroup' };
-        serverChannel.send(event);
-    },
-
     addMessage: function(message) {
-        serverChannel.send({ event: 'SendMessage', message: message });
-    },
-
-    receiveMessages: function(newMessages) {
-        var allMessages = this.state.messages.concat(newMessages);
-        this.setState({ messages: allMessages });
-    },
-
-    receiveMembers: function(newMembers) {
-        var otherUsers = this.state.users.filter(function(user) {
-            for (var i = 0; i < newMembers.length; i++) {
-                if (user.username === newMembers[i].username) {
-                    return false;
-                }
-            }
-            return true;
-        });
-        var allUsers = otherUsers.concat(newMembers);
-        this.setState({ users: allUsers });
-    },
-
-    updateMemberStatus: function(updatedMember) {
-        this.receiveMembers([updatedMember]);
+        ChatActions.sendMessage(message);
     },
 
     userActivityTimestamp: new Date().getTime(),
@@ -168,10 +107,9 @@ var ChatRoom = React.createClass({
         this.userActivityTimestamp = new Date().getTime();
         if (this.state.userStatus !== 'online') {
             this.setState({ userStatus: 'online' });
-            serverChannel.send({ event: 'UserActivity' });
+            UserActions.trackActivity();
         }
     },
-
 
     scheduleActivityTracking: function() {
         var timeout = 30000; // 30 secs for interval, 60 secs for away timeout
@@ -179,11 +117,12 @@ var ChatRoom = React.createClass({
             var now = new Date().getTime();
             if (now - this.userActivityTimestamp > timeout) {
                 if (this.state.userStatus === 'online') {
-                    serverChannel.send({event: 'UserWentAway', lastAccessTime: this.userActivityTimestamp});
+                    UserActions.userWentAway(this.userActivityTimestamp);
                     this.setState({ userStatus: 'away' });
+
                 }
             } else {
-                serverChannel.send({ event: 'UserActivity' });
+                UserActions.trackActivity();
             }
         }.bind(this), timeout);
     },
@@ -193,23 +132,21 @@ var ChatRoom = React.createClass({
     },
 
     componentDidMount: function() {
-        serverChannel = ServerChannel(this.props.roomId, this.props.username);
-        serverChannel.setEventCallback('NewMessages', function(data) {
-            this.receiveMessages(data.messages);
-        }.bind(this));
-        serverChannel.setEventCallback('NewMembers', function(data) {
-            this.receiveMembers(data.members);
-        }.bind(this));
-        serverChannel.setEventCallback('MemberStatusUpdate', function(data) {
-            this.updateMemberStatus(data.member);
-        }.bind(this));
-        serverChannel.onReady(this.join);
+        ChatStore.addChangeListener(this._onChange);
         this.scheduleActivityTracking();
     },
 
     componentWillUnmount: function() {
-        serverChannel.close();
+        ChatActions.closeChatRoom();
+        ChatStore.removeChangeListener(this._onChange);
         clearTimeout(this.intervalHandle);
+    },
+
+    _onChange: function() {
+        this.setState({
+            users: ChatStore.getUsers(),
+            messages: ChatStore.getMessages()
+        });
     },
 
     render: function() {

@@ -1,7 +1,7 @@
 
 var React = require('react'),
-    Homepage = require('./Homepage'),
-    ChatRoom = require('./ChatRoom');
+    Homepage = require('./components/Homepage'),
+    ChatRoom = require('./components/ChatRoom');
 
 var Router = function(rootElement) {
 

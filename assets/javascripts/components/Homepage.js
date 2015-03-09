@@ -1,6 +1,7 @@
 
-var React = require('react');
-var Fetch = require('whatwg-fetch');
+var React = require('react'),
+    ChatActions = require('../actions/ChatActions'),
+    ChatStore = require('../stores/ChatStore');
 
 var Menu = React.createClass({
 
@@ -29,7 +30,6 @@ var Menu = React.createClass({
 var JoinMenu = React.createClass({
 
     propTypes: {
-        router: React.PropTypes.object.isRequired,
         roomId: React.PropTypes.string.isRequired,
         onBack: React.PropTypes.func.isRequired
     },
@@ -41,7 +41,7 @@ var JoinMenu = React.createClass({
         if (!username || !roomId) {
             return;
         }
-        this.props.router.navigateToRoom(username, roomId)
+        ChatActions.joinChatRoom(username, roomId);
     },
 
     render: function() {
@@ -73,7 +73,6 @@ var JoinMenu = React.createClass({
 var CreateMenu = React.createClass({
 
     propTypes: {
-        router: React.PropTypes.object.isRequired,
         onBack: React.PropTypes.func.isRequired
     },
 
@@ -83,11 +82,7 @@ var CreateMenu = React.createClass({
         if (!username) {
             return;
         }
-        window.fetch('/create?username='+username, { method: 'post' })
-            .then(function(response){ return response.json(); })
-            .then(function(json) {
-                this.props.router.navigateToRoom(username, json.roomId)
-            }.bind(this));
+        ChatActions.createChatRoom(username);
     },
 
     render: function() {
@@ -130,6 +125,18 @@ var Homepage = React.createClass({
 
     displayWelcomeMsg: function() {
         this.navigate('welcome');
+    },
+
+    componentDidMount: function() {
+        ChatStore.addChangeListener(this._onChange);
+    },
+
+    componentWillUnmount: function() {
+        ChatStore.removeChangeListener(this._onChange);
+    },
+
+    _onChange: function() {
+        this.props.router.navigateToRoom(ChatStore.getCurrentUser(), ChatStore.getJoinedChatRoom());
     },
 
     render: function() {

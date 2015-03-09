@@ -13,7 +13,10 @@
   "license": "Apache APL",
   "dependencies": {
     "classnames": "^1.1.4",
+    "flux": "^2.0.1",
+    "keymirror": "^0.1.1",
     "moment": "^2.9.0",
+    "object-assign": "^2.0.0",
     "react": "^0.12.2",
     "whatwg-fetch": "^0.7.0"
   },
