@@ -10,27 +10,27 @@ var UserList = React.createClass({
         currentUser: React.PropTypes.string.isRequired
     },
 
-   render: function() {
-       var userNodes = this.props.users.map(function(user) {
-           var classes = classNames('user-' + user.status, {'currentUser': this.props.currentUser === user.username});
-           if (user.status === 'online') {
-               return <li className={classes} key={user.username}>{user.username}</li>;
-           } else {
-               return (
-                   <li className={classes} key={user.username}>
+    render: function() {
+        var userNodes = this.props.users.map(function(user) {
+            var classes = classNames('user-' + user.status, {'currentUser': this.props.currentUser === user.username});
+            if (user.status === 'online') {
+                return <li className={classes} key={user.username}>{user.username}</li>;
+            } else {
+                return (
+                    <li className={classes} key={user.username}>
                        {user.username} <small>({user.status} since: {moment(user.lastActive).fromNow()})</small>
-                   </li>
-               );
-           }
-       }.bind(this));
-       return (
-           <div className="userList">
-               <ul>
+                    </li>
+                );
+            }
+        }.bind(this));
+        return (
+            <div className="userList">
+                <ul>
                     {userNodes}
-               </ul>
-           </div>
-       );
-   }
+                </ul>
+            </div>
+        );
+    }
 });
 
 var MessageList = React.createClass({

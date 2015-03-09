@@ -13,14 +13,13 @@ var Menu = React.createClass({
     },
 
     createChat: function() {
-       this.props.onNavigate('create');
+        this.props.onNavigate('create');
     },
 
     render: function() {
         return (
             <p>
-                <a className="btn btn-primary btn-lg" href="#" onClick={this.joinChat} role="button">Join</a>
-                &nbsp;or&nbsp;
+                <a className="btn btn-primary btn-lg" href="#" onClick={this.joinChat} role="button">Join</a>&nbsp;or&nbsp;
                 <a className="btn btn-primary btn-lg" href="#" onClick={this.createChat} role="button">Create</a>
             </p>
         );
@@ -62,8 +61,7 @@ var JoinMenu = React.createClass({
                             <label htmlFor="username">Your urername</label>
                             <input className="form-control" placeholder="e.g. spiros" name="username" ref="username"/>
                         </div>
-                        <button type="submit" className="btn btn-primary">Join</button>
-                        &nbsp;or&nbsp;
+                        <button type="submit" className="btn btn-primary">Join</button>&nbsp;or&nbsp;
                         <a href="#" onClick={this.props.onBack}>Cancel</a>
                     </form>
                 </div>
@@ -105,8 +103,7 @@ var CreateMenu = React.createClass({
                             <label htmlFor="username">Your username</label>
                             <input className="form-control" ref="username" name="username" placeholder="e.g. spiros"/>
                         </div>
-                        <button type="submit" className="btn btn-primary">Create &amp; Join</button>
-                        &nbsp;or&nbsp;
+                        <button type="submit" className="btn btn-primary">Create &amp; Join</button>&nbsp;or&nbsp;
                         <a href="#" onClick={this.props.onBack}>Cancel</a>
                     </form>
                 </div>
