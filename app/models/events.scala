@@ -15,7 +15,7 @@ package events {
   case class UserWentAway(lastAccessTime: Long) extends InEvent
 
   object InEvent {
-    implicit val jsonFormatter: Format[InEvent] = Variants.format[InEvent]("event")
+    implicit val jsonFormatter: Format[InEvent] = Variants.format[InEvent]((__ \ "event").format[String])
     implicit val frameFormatter = FrameFormatter.jsonFrame[InEvent]
   }
 
@@ -27,7 +27,7 @@ package events {
 
   object OutEvent {
 
-    implicit val jsonFormatter: Format[OutEvent] = Variants.format[OutEvent]("event")
+    implicit val jsonFormatter: Format[OutEvent] = Variants.format[OutEvent]((__ \ "event").format[String])
 
     implicit val frameFormatter = FrameFormatter.jsonFrame[OutEvent]
 
