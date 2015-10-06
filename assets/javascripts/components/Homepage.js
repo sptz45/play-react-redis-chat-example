@@ -1,40 +1,46 @@
 
-var React = require('react'),
-    ChatActions = require('../actions/ChatActions'),
-    ChatStore = require('../stores/ChatStore');
+import '../../stylesheets/main.less';
 
-var Menu = React.createClass({
+import React from 'react';
+import ChatActions from '../actions/ChatActions';
+import ChatStore from '../stores/ChatStore';
 
-    propTypes: {
-        onNavigate: React.PropTypes.func.isRequired
-    },
 
-    joinChat: function() {
+class Menu extends React.Component {
+
+    static propTypes = { onNavigate: React.PropTypes.func.isRequired };
+
+    joinChat() {
         this.props.onNavigate('join');
-    },
+    }
 
-    createChat: function() {
+    createChat() {
         this.props.onNavigate('create');
-    },
+    }
 
-    render: function() {
+    render() {
         return (
             <p>
-                <a className="btn btn-primary btn-lg" href="#" onClick={this.joinChat} role="button">Join</a>&nbsp;or&nbsp;
-                <a className="btn btn-primary btn-lg" href="#" onClick={this.createChat} role="button">Create</a>
+                <a className="btn btn-primary btn-lg" href="#" onClick={this.joinChat.bind(this)} role="button">Join</a>&nbsp;or&nbsp;
+                <a className="btn btn-primary btn-lg" href="#" onClick={this.createChat.bind(this)} role="button">Create</a>
             </p>
         );
     }
-});
+}
 
-var JoinMenu = React.createClass({
+class JoinMenu extends React.Component {
 
-    propTypes: {
+    static propTypes = {
         roomId: React.PropTypes.string.isRequired,
         onBack: React.PropTypes.func.isRequired
-    },
+    };
 
-    handleSubmit: function(event) {
+    constructor() {
+        super();
+        this.handleSubmit = this.handleSubmit.bind(this);
+    }
+
+    handleSubmit(event) {
         event.preventDefault();
         var username = this.refs.username.getDOMNode().value.trim();
         var roomId = this.refs.roomId.getDOMNode().value.trim();
@@ -42,9 +48,9 @@ var JoinMenu = React.createClass({
             return;
         }
         ChatActions.joinChatRoom(username, roomId);
-    },
+    }
 
-    render: function() {
+    render() {
         return(
             <div>
                 <h1>
@@ -68,24 +74,27 @@ var JoinMenu = React.createClass({
             </div>
         );
     }
-});
+}
 
-var CreateMenu = React.createClass({
+class CreateMenu extends React.Component {
 
-    propTypes: {
-        onBack: React.PropTypes.func.isRequired
-    },
+    static propTypes = { onBack: React.PropTypes.func.isRequired };
 
-    handleSubmit: function(event) {
+    constructor() {
+        super();
+        this.handleSubmit = this.handleSubmit.bind(this);
+    }
+
+    handleSubmit(event) {
         event.preventDefault();
         var username = this.refs.username.getDOMNode().value.trim();
         if (!username) {
             return;
         }
         ChatActions.createChatRoom(username);
-    },
+    }
 
-    render: function() {
+    render() {
         return(
             <div>
                 <h1>
@@ -105,41 +114,42 @@ var CreateMenu = React.createClass({
             </div>
         );
     }
-});
+}
 
-var Homepage = React.createClass({
+class Homepage extends React.Component {
 
-    propTypes: {
+    static propTypes = {
         router: React.PropTypes.object.isRequired,
         roomId: React.PropTypes.string
-    },
+    };
 
-    getInitialState: function() {
-        var action = this.props.roomId ? 'join' : 'welcome';
-        return { action: action };
-    },
+    constructor(props) {
+        super(props);
+        this.state = { action: this.props.roomId ? 'join' : 'welcome' };
+        this._onChange = this._onChange.bind(this);
+    }
 
-    navigate: function(action) {
+    navigate(action) {
         this.setState({ action: action });
-    },
+    }
 
-    displayWelcomeMsg: function() {
+    displayWelcomeMsg() {
         this.navigate('welcome');
-    },
+    }
 
-    componentDidMount: function() {
+    componentDidMount() {
         ChatStore.addChangeListener(this._onChange);
-    },
+    }
 
-    componentWillUnmount: function() {
+    componentWillUnmount() {
         ChatStore.removeChangeListener(this._onChange);
-    },
+    }
 
-    _onChange: function() {
+    _onChange() {
         this.props.router.navigateToRoom(ChatStore.getCurrentUser(), ChatStore.getJoinedChatRoom());
-    },
+    }
 
-    render: function() {
+    render() {
         var component = (
             <div>
                 <h1>
@@ -147,13 +157,13 @@ var Homepage = React.createClass({
                     Welcome to mychat
                 </h1>
                 <p>Here you can create a chat room to chat with your friends and colleagues or join an existing chat room.</p>
-                <Menu onNavigate={this.navigate}/>
+                <Menu onNavigate={this.navigate.bind(this)}/>
             </div>
         );
         if (this.state.action === 'join') {
-            component = <JoinMenu router={this.props.router} onBack={this.displayWelcomeMsg} roomId={this.props.roomId}/>;
+            component = <JoinMenu router={this.props.router} onBack={this.displayWelcomeMsg.bind(this)} roomId={this.props.roomId}/>;
         } else if (this.state.action === 'create') {
-            component = <CreateMenu router={this.props.router} onBack={this.displayWelcomeMsg}/>
+            component = <CreateMenu router={this.props.router} onBack={this.displayWelcomeMsg.bind(this)}/>
         }
 
         return (
@@ -164,6 +174,6 @@ var Homepage = React.createClass({
             </div>
         );
     }
-});
+}
 
-module.exports = Homepage;
+export default Homepage;

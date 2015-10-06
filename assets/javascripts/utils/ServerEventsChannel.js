@@ -1,48 +1,36 @@
 
-var assign = require('object-assign');
+import assign from 'object-assign';
 
-var ServerEventsChannel = function() {
+class ServerEventChannel {
 
-    var socket = null;
-    var _callback = function(){};
-
-    function init() {
-        socket.onopen = function () {
-            console.log('we are open');
-        };
-        socket.onerror = function (error) {
-            console.log('An error occurred: ' + error);
-        };
-        socket.onmessage = function (msg) {
-            var data = JSON.parse(msg.data);
-            _callback(data);
-        };
+    constructor() {
+        this.socket = null;
+        this.callback = function(){};
     }
 
-    return {
+    connectTo(url) {
+        this.socket = new WebSocket(url);
+        this.socket.onopen = () => console.log('we are open');
+        this.socket.onerror = (error) => console.log('An error occurred: ' + error);
+        this.socket.onmessage = (msg) => this.callback(JSON.parse(msg.data));
+    }
 
-        connectTo: function(url) {
-            socket = new WebSocket(url);
-            init();
-        },
+    sendEvent(event, data) {
+        let msg = assign({ event: event }, data);
+        this.socket.send(JSON.stringify(msg));
+    }
 
-        sendEvent: function(event, data) {
-            var msg = assign({ event: event }, data);
-            socket.send(JSON.stringify(msg));
-        },
+    receiveEventsWith(callback) {
+        this.callback = callback;
+    }
 
-        receiveEventsWith: function(callback) {
-            _callback = callback;
-        },
+    onReady(callback) {
+        this.socket.onopen = callback;
+    }
 
-        onReady: function(callback) {
-            socket.onopen = callback;
-        },
+    close() {
+        this.socket.close();
+    }
+}
 
-        close: function() {
-            socket.close();
-        }
-    };
-};
-
-module.exports = ServerEventsChannel();
+export default new ServerEventChannel();

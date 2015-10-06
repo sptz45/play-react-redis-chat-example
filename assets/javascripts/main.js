@@ -1,7 +1,7 @@
 
-var Router = require('./Router');
+import Router from './Router';
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', () => {
     Router('content').navigateToHome(window.location.pathname);
 });
 

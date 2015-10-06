@@ -1,11 +1,11 @@
 
-var AppDispatcher = require('../dispatcher/AppDispatcher'),
-    AbstractStore = require('./AbstractStore'),
-    assign = require('object-assign'),
-    ActionTypes = require('../constants/ActionTypes'),
-    ChatEvents = require('../constants/ChatEvents'),
-    Fetch = require('whatwg-fetch'),
-    ServerEventsChannel = require('../utils/ServerEventsChannel');
+import AppDispatcher from '../dispatcher/AppDispatcher';
+import AbstractStore from './AbstractStore';
+import assign from 'object-assign';
+import ActionTypes from '../constants/ActionTypes';
+import ChatEvents from '../constants/ChatEvents';
+import Fetch from 'whatwg-fetch';
+import ServerEventsChannel from '../utils/ServerEventsChannel';
 
 var data = {
     currentUser: null,
@@ -16,15 +16,13 @@ var data = {
 
 function getServerChannelUrl() {
     var location = window.location;
-    return 'ws://'+location.hostname+':'+location.port+'/chat/'+data.joinedChatRoom+'/'+data.currentUser;
+    return `ws://${location.hostname}:${location.port}/chat/${data.joinedChatRoom}/${data.currentUser}`;
 }
 
 function createChatRoom(firstUser) {
     return window.fetch('/create?username='+firstUser, { method: 'post' })
-        .then(function(response){ return response.json(); })
-        .then(function(json) {
-            return { username: firstUser, chatRoom: json.roomId };
-        });
+        .then(response => response.json())
+        .then(json => ({ username: firstUser, chatRoom: json.roomId }));
 }
 
 function joinChatRoom(username, chatRoom) {
@@ -36,27 +34,25 @@ function joinChatRoom(username, chatRoom) {
         switch (event.event) {
             case ChatEvents.NEW_MESSAGES:
                 data.messages = data.messages.concat(event.messages);
-                ChatStore.emitChange();
+                chatStore.emitChange();
                 break;
             case ChatEvents.NEW_MEMBERS:
                 receiveMembers(event.members);
-                ChatStore.emitChange();
+                chatStore.emitChange();
                 break;
             case ChatEvents.MEMBER_STATUS_UPDATE:
                 receiveMembers([event.member]);
-                ChatStore.emitChange();
+                chatStore.emitChange();
                 break;
             default:
             // no-op
         }
     });
-    ServerEventsChannel.onReady(function() {
-        ServerEventsChannel.sendEvent(ChatEvents.JOIN_GROUP);
-    });
+    ServerEventsChannel.onReady(() => ServerEventsChannel.sendEvent(ChatEvents.JOIN_GROUP));
 }
 
 function receiveMembers(newMembers) {
-    var otherUsers = data.users.filter(function(user) {
+    var otherUsers = data.users.filter(user => {
         for (var i = 0; i < newMembers.length; i++) {
             if (user.username === newMembers[i].username) {
                 return false;
@@ -67,37 +63,37 @@ function receiveMembers(newMembers) {
     data.users = otherUsers.concat(newMembers);
 }
 
-var ChatStore = assign({}, AbstractStore, {
+class ChatStore extends AbstractStore {
 
-    getCurrentUser: function() {
+    getCurrentUser() {
         return data.currentUser;
-    },
+    }
 
-    getJoinedChatRoom: function() {
+    getJoinedChatRoom() {
         return data.joinedChatRoom;
-    },
+    }
 
-    getMessages: function() {
+    getMessages() {
         return data.messages;
-    },
+    }
 
-    getUsers: function() {
+    getUsers() {
         return data.users;
     }
-});
+}
 
-AppDispatcher.register(function(action) {
+AppDispatcher.register((action) => {
     switch (action.actionType) {
         case ActionTypes.CHAT_CREATE_ROOM:
             createChatRoom(action.firstUser)
-                .then(function(r) {
+                .then(r => {
                     joinChatRoom(r.username, r.chatRoom);
-                    ChatStore.emitChange();
+                    chatStore.emitChange();
                 });
             break;
         case ActionTypes.CHAT_JOIN_ROOM:
             joinChatRoom(action.username, action.chatRoom);
-            ChatStore.emitChange();
+            chatStore.emitChange();
             break;
         case ActionTypes.CHAT_SEND_MESSAGE:
             ServerEventsChannel.sendEvent(ChatEvents.SEND_MESSAGE, { message: action.message });
@@ -110,5 +106,6 @@ AppDispatcher.register(function(action) {
     }
 });
 
+let chatStore = new ChatStore();
 
-module.exports = ChatStore;
+export default chatStore;

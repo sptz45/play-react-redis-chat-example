@@ -1,5 +1,5 @@
 
-var ChatEvents = {
+export default {
     // sent to the server
     JOIN_GROUP: 'JoinGroup',
     LEAVE_GROUP: 'LeaveGroup',
@@ -13,5 +13,3 @@ var ChatEvents = {
     MEMBER_STATUS_UPDATE: 'MemberStatusUpdate',
     NEW_MESSAGES: 'NewMessages'
 };
-
-module.exports = ChatEvents;

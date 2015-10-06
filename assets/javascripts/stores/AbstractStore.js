@@ -1,22 +1,23 @@
 
-var EventEmitter = require('events').EventEmitter,
-    assign = require('object-assign');
+import {EventEmitter} from 'events';
+import assign from 'object-assign';
 
-var AbstractStore = assign({}, EventEmitter.prototype, {
+export default class AbstractStore extends EventEmitter {
 
-    changeEventName: 'change',
+    constructor() {
+        super();
+        this.changeEventName = 'change';
+    }
 
-    emitChange: function() {
+    emitChange() {
         this.emit(this.changeEventName);
-    },
+    }
 
-    addChangeListener: function(callback) {
+    addChangeListener(callback) {
         this.on(this.changeEventName, callback);
-    },
+    }
 
-    removeChangeListener: function(callback) {
+    removeChangeListener(callback) {
         this.removeListener(this.changeEventName, callback);
     }
-});
-
-module.exports = AbstractStore;
+}

@@ -1,9 +1,9 @@
 
-var React = require('react'),
-    Homepage = require('./components/Homepage'),
-    ChatRoom = require('./components/ChatRoom');
+import React from 'react';
+import Homepage from './components/Homepage';
+import ChatRoom from './components/ChatRoom';
 
-var Router = function(rootElement) {
+export default function(rootElement) {
 
     function render(component) {
         React.render(component, document.getElementById(rootElement));
@@ -19,19 +19,17 @@ var Router = function(rootElement) {
 
     return {
 
-        navigateToHome: function(path) {
-            var roomId = getRoomIdFromPath(path);
+        navigateToHome(path) {
+            let roomId = getRoomIdFromPath(path);
             render(<Homepage router={this} roomId={roomId}/>);
         },
 
-        navigateToRoom: function(username, roomId) {
+        navigateToRoom(username, roomId) {
             render(<ChatRoom roomId={roomId} username={username}/>);
-            var path = getPathFromRoomId(roomId);
+            let path = getPathFromRoomId(roomId);
             if (window.location.path !== path) {
                 history.pushState({ roomId: roomId }, "My Chat", path);
             }
         }
     };
 };
-
-module.exports = Router;

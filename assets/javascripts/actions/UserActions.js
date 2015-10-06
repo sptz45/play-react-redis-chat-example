@@ -1,18 +1,13 @@
-var AppDispatcher = require('../dispatcher/AppDispatcher'),
-    ActionTypes = require('../constants/ActionTypes');
+import AppDispatcher from '../dispatcher/AppDispatcher';
+import ActionTypes from '../constants/ActionTypes';
 
-var UserActions = {
+export default {
 
-    trackActivity: function() {
+    trackActivity() {
         AppDispatcher.dispatch({ actionType: ActionTypes.USER_ACTIVITY });
     },
 
-    userWentAway: function(lastAccessTime) {
-        AppDispatcher.dispatch({
-            actionType: ActionTypes.USER_WENT_AWAY,
-            lastAccessTime: lastAccessTime
-        });
+    userWentAway(lastAccessTime) {
+        AppDispatcher.dispatch({ actionType: ActionTypes.USER_WENT_AWAY, lastAccessTime });
     }
 };
-
-module.exports = UserActions;

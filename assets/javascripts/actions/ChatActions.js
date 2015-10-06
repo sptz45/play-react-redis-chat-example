@@ -1,35 +1,23 @@
 
-var AppDispatcher = require('../dispatcher/AppDispatcher'),
-    ActionTypes = require('../constants/ActionTypes');
+import AppDispatcher from '../dispatcher/AppDispatcher';
+import ActionTypes from '../constants/ActionTypes';
 
-var ChatActions = {
+export default {
 
-    createChatRoom: function(firstUser) {
-        AppDispatcher.dispatch({
-            actionType: ActionTypes.CHAT_CREATE_ROOM,
-            firstUser: firstUser
-        });
+    createChatRoom(firstUser) {
+        AppDispatcher.dispatch({ actionType: ActionTypes.CHAT_CREATE_ROOM, firstUser });
     },
 
-    joinChatRoom: function(username, chatRoom) {
-        AppDispatcher.dispatch({
-            actionType: ActionTypes.CHAT_JOIN_ROOM,
-            username: username,
-            chatRoom: chatRoom
-        });
+    joinChatRoom(username, chatRoom) {
+        AppDispatcher.dispatch({ actionType: ActionTypes.CHAT_JOIN_ROOM, username, chatRoom });
     },
 
-    closeChatRoom: function() {
+    closeChatRoom() {
         AppDispatcher.dispatch({ actionType: ActionTypes.CHAT_CLOSE });
     },
 
-    sendMessage: function(message) {
-        AppDispatcher.dispatch({
-            actionType: ActionTypes.CHAT_SEND_MESSAGE,
-            message: message
-        });
+    sendMessage(message) {
+        AppDispatcher.dispatch({ actionType: ActionTypes.CHAT_SEND_MESSAGE, message });
     }
 
 };
-
-module.exports = ChatActions;

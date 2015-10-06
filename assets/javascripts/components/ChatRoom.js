@@ -1,20 +1,20 @@
 
-var React = require('react'),
-    moment = require('moment'),
-    classNames = require('classnames'),
-    ChatActions = require('../actions/ChatActions'),
-    UserActions = require('../actions/UserActions'),
-    ChatStore = require('../stores/ChatStore'),
-    UserActivityStore = require('../stores/UserActivityStore');
+import React from "react";
+import moment from 'moment';
+import classNames from 'classnames';
+import ChatActions from '../actions/ChatActions';
+import UserActions from '../actions/UserActions';
+import ChatStore from '../stores/ChatStore';
+import UserActivityStore from '../stores/UserActivityStore';
 
-var UserList = React.createClass({
+class UserList extends React.Component {
 
-    propTypes: {
+    static propTypes = {
         users: React.PropTypes.array.isRequired,
         currentUser: React.PropTypes.string.isRequired
-    },
+    };
 
-    render: function() {
+    render() {
         var userNodes = this.props.users.map(function(user) {
             var classes = classNames('user-' + user.status, {'currentUser': this.props.currentUser === user.username});
             if (user.status === 'online') {
@@ -35,16 +35,14 @@ var UserList = React.createClass({
             </div>
         );
     }
-});
+}
 
-var MessageList = React.createClass({
+class MessageList extends React.Component {
 
-    propTypes: {
-        messages: React.PropTypes.array.isRequired
-    },
+    static propTypes = { messages: React.PropTypes.array.isRequired };
 
-    render: function() {
-        var messageNodes = this.props.messages.map(function(msg) {
+    render() {
+        var messageNodes = this.props.messages.map(msg => {
             return (
                 <li key={msg.timestamp}>
                     <b>{msg.user}</b>&nbsp;
@@ -61,24 +59,27 @@ var MessageList = React.createClass({
             </div>
         );
     }
-});
+}
 
-var ChatInput = React.createClass({
+class ChatInput extends React.Component {
 
-    propTypes: {
-        onNewMessage: React.PropTypes.func.isRequired
-    },
+    static propTypes = { onNewMessage: React.PropTypes.func.isRequired };
 
-    onNewMessage: function(event) {
+    constructor() {
+        super();
+        this.onNewMessage = this.onNewMessage.bind(this);
+    }
+
+    onNewMessage(event) {
         event.preventDefault();
         var msg = this.refs.message.getDOMNode().value.trim();
         if (msg) {
             this.props.onNewMessage(msg);
             this.refs.message.getDOMNode().value = '';
         }
-    },
+    }
 
-    render: function() {
+    render() {
         return (
             <div>
                 <form onSubmit={this.onNewMessage}>
@@ -88,32 +89,37 @@ var ChatInput = React.createClass({
             </div>
         );
     }
-});
+}
 
-var ChatRoom = React.createClass({
+class ChatRoom extends React.Component {
 
-    propTypes: {
+    static propTypes = {
         username: React.PropTypes.string.isRequired,
         roomId: React.PropTypes.string.isRequired
-    },
+    };
 
-    addMessage: function(message) {
+    constructor(props) {
+        super(props);
+        this.userActivityTimestamp = new Date().getTime();
+        this.state = { users: [], messages: [], userStatus: 'online' };
+        this._onChange = this._onChange.bind(this);
+    }
+
+    addMessage(message) {
         ChatActions.sendMessage(message);
-    },
+    }
 
-    userActivityTimestamp: new Date().getTime(),
-
-    trackUserActivity: function(event) {
+    trackUserActivity(event) {
         this.userActivityTimestamp = new Date().getTime();
         if (this.state.userStatus !== 'online') {
             this.setState({ userStatus: 'online' });
             UserActions.trackActivity();
         }
-    },
+    }
 
-    scheduleActivityTracking: function() {
+    scheduleActivityTracking() {
         var timeout = 30000; // 30 secs for interval, 60 secs for away timeout
-        this.intervalHandle =  setInterval(function() {
+        this.intervalHandle =  setInterval(() => {
             var now = new Date().getTime();
             if (now - this.userActivityTimestamp > timeout) {
                 if (this.state.userStatus === 'online') {
@@ -125,33 +131,29 @@ var ChatRoom = React.createClass({
                 UserActions.trackActivity();
             }
         }.bind(this), timeout);
-    },
+    }
 
-    getInitialState: function() {
-        return { users: [], messages: [], userStatus: 'online' };
-    },
-
-    componentDidMount: function() {
+    componentDidMount() {
         ChatStore.addChangeListener(this._onChange);
         this.scheduleActivityTracking();
-    },
+    }
 
-    componentWillUnmount: function() {
+    componentWillUnmount() {
         ChatActions.closeChatRoom();
         ChatStore.removeChangeListener(this._onChange);
         clearTimeout(this.intervalHandle);
-    },
+    }
 
-    _onChange: function() {
+    _onChange() {
         this.setState({
             users: ChatStore.getUsers(),
             messages: ChatStore.getMessages()
         });
-    },
+    }
 
-    render: function() {
+    render() {
         return (
-            <div className="row" onMouseMove={this.trackUserActivity} onKeyPress={this.trackUserActivity}>
+            <div className="row" onMouseMove={this.trackUserActivity.bind(this)} onKeyPress={this.trackUserActivity.bind(this)}>
                 <div className="row chatRoomHeader">
                     <div className="col-md-12">
                         <h1>Chat room {this.props.roomId}</h1>
@@ -166,7 +168,7 @@ var ChatRoom = React.createClass({
                         </div>
                         <div className="row">
                             <div className="col-md-12">
-                                <ChatInput onNewMessage={this.addMessage}/>
+                                <ChatInput onNewMessage={this.addMessage.bind(this)}/>
                             </div>
                         </div>
                     </div>
@@ -177,7 +179,6 @@ var ChatRoom = React.createClass({
             </div>
         );
     }
-});
+}
 
-
-module.exports = ChatRoom;
+export default ChatRoom;
