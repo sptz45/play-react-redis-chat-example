@@ -17,8 +17,9 @@ module.exports = {
   },
 
   externals: {
-    moment: 'moment',
-    react: 'React'
+    //'react': 'React',
+    //'react-dom': 'ReactDom',
+    'moment': 'moment'
   },
   
   resolve: {

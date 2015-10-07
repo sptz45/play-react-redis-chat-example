@@ -72,10 +72,10 @@ class ChatInput extends React.Component {
 
     onNewMessage(event) {
         event.preventDefault();
-        var msg = this.refs.message.getDOMNode().value.trim();
+        var msg = this.refs.message.value.trim();
         if (msg) {
             this.props.onNewMessage(msg);
-            this.refs.message.getDOMNode().value = '';
+            this.refs.message.value = '';
         }
     }
 

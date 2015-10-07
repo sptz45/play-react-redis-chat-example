@@ -42,8 +42,8 @@ class JoinMenu extends React.Component {
 
     handleSubmit(event) {
         event.preventDefault();
-        var username = this.refs.username.getDOMNode().value.trim();
-        var roomId = this.refs.roomId.getDOMNode().value.trim();
+        var username = this.refs.username.value.trim();
+        var roomId = this.refs.roomId.value.trim();
         if (!username || !roomId) {
             return;
         }
@@ -87,7 +87,7 @@ class CreateMenu extends React.Component {
 
     handleSubmit(event) {
         event.preventDefault();
-        var username = this.refs.username.getDOMNode().value.trim();
+        var username = this.refs.username.value.trim();
         if (!username) {
             return;
         }

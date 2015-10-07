@@ -1,12 +1,13 @@
 
 import React from 'react';
+import ReactDOM from 'react-dom';
 import Homepage from './components/Homepage';
 import ChatRoom from './components/ChatRoom';
 
 export default function(rootElement) {
 
     function render(component) {
-        React.render(component, document.getElementById(rootElement));
+        ReactDOM.render(component, document.getElementById(rootElement));
     }
 
     function getRoomIdFromPath(path) {
