@@ -2,6 +2,7 @@
 import '../../stylesheets/main.less';
 
 import React from 'react';
+import { autobind } from 'core-decorators';
 import ChatActions from '../actions/ChatActions';
 import ChatStore from '../stores/ChatStore';
 
@@ -10,10 +11,12 @@ class Menu extends React.Component {
 
     static propTypes = { onNavigate: React.PropTypes.func.isRequired };
 
+    @autobind
     joinChat() {
         this.props.onNavigate('join');
     }
 
+    @autobind
     createChat() {
         this.props.onNavigate('create');
     }
@@ -21,8 +24,8 @@ class Menu extends React.Component {
     render() {
         return (
             <p>
-                <a className="btn btn-primary btn-lg" href="#" onClick={this.joinChat.bind(this)} role="button">Join</a>&nbsp;or&nbsp;
-                <a className="btn btn-primary btn-lg" href="#" onClick={this.createChat.bind(this)} role="button">Create</a>
+                <a className="btn btn-primary btn-lg" href="#" onClick={this.joinChat} role="button">Join</a>&nbsp;or&nbsp;
+                <a className="btn btn-primary btn-lg" href="#" onClick={this.createChat} role="button">Create</a>
             </p>
         );
     }
@@ -37,9 +40,9 @@ class JoinMenu extends React.Component {
 
     constructor() {
         super();
-        this.handleSubmit = this.handleSubmit.bind(this);
     }
 
+    @autobind
     handleSubmit(event) {
         event.preventDefault();
         var username = this.refs.username.value.trim();
@@ -82,9 +85,9 @@ class CreateMenu extends React.Component {
 
     constructor() {
         super();
-        this.handleSubmit = this.handleSubmit.bind(this);
     }
 
+    @autobind
     handleSubmit(event) {
         event.preventDefault();
         var username = this.refs.username.value.trim();
@@ -126,13 +129,14 @@ class Homepage extends React.Component {
     constructor(props) {
         super(props);
         this.state = { action: this.props.roomId ? 'join' : 'welcome' };
-        this._onChange = this._onChange.bind(this);
     }
 
+    @autobind
     navigate(action) {
         this.setState({ action: action });
     }
 
+    @autobind
     displayWelcomeMsg() {
         this.navigate('welcome');
     }
@@ -145,6 +149,7 @@ class Homepage extends React.Component {
         ChatStore.removeChangeListener(this._onChange);
     }
 
+    @autobind
     _onChange() {
         this.props.router.navigateToRoom(ChatStore.getCurrentUser(), ChatStore.getJoinedChatRoom());
     }
@@ -157,13 +162,13 @@ class Homepage extends React.Component {
                     Welcome to mychat
                 </h1>
                 <p>Here you can create a chat room to chat with your friends and colleagues or join an existing chat room.</p>
-                <Menu onNavigate={this.navigate.bind(this)}/>
+                <Menu onNavigate={this.navigate}/>
             </div>
         );
         if (this.state.action === 'join') {
-            component = <JoinMenu router={this.props.router} onBack={this.displayWelcomeMsg.bind(this)} roomId={this.props.roomId}/>;
+            component = <JoinMenu router={this.props.router} onBack={this.displayWelcomeMsg} roomId={this.props.roomId}/>;
         } else if (this.state.action === 'create') {
-            component = <CreateMenu router={this.props.router} onBack={this.displayWelcomeMsg.bind(this)}/>
+            component = <CreateMenu router={this.props.router} onBack={this.displayWelcomeMsg}/>
         }
 
         return (

@@ -2,6 +2,7 @@
 import React from "react";
 import moment from 'moment';
 import classNames from 'classnames';
+import { autobind } from 'core-decorators';
 import ChatActions from '../actions/ChatActions';
 import UserActions from '../actions/UserActions';
 import ChatStore from '../stores/ChatStore';
@@ -67,9 +68,9 @@ class ChatInput extends React.Component {
 
     constructor() {
         super();
-        this.onNewMessage = this.onNewMessage.bind(this);
     }
 
+    @autobind
     onNewMessage(event) {
         event.preventDefault();
         var msg = this.refs.message.value.trim();
@@ -102,13 +103,14 @@ class ChatRoom extends React.Component {
         super(props);
         this.userActivityTimestamp = new Date().getTime();
         this.state = { users: [], messages: [], userStatus: 'online' };
-        this._onChange = this._onChange.bind(this);
     }
 
+    @autobind
     addMessage(message) {
         ChatActions.sendMessage(message);
     }
 
+    @autobind
     trackUserActivity(event) {
         this.userActivityTimestamp = new Date().getTime();
         if (this.state.userStatus !== 'online') {
@@ -144,6 +146,7 @@ class ChatRoom extends React.Component {
         clearTimeout(this.intervalHandle);
     }
 
+    @autobind
     _onChange() {
         this.setState({
             users: ChatStore.getUsers(),
@@ -153,7 +156,7 @@ class ChatRoom extends React.Component {
 
     render() {
         return (
-            <div className="row" onMouseMove={this.trackUserActivity.bind(this)} onKeyPress={this.trackUserActivity.bind(this)}>
+            <div className="row" onMouseMove={this.trackUserActivity} onKeyPress={this.trackUserActivity}>
                 <div className="row chatRoomHeader">
                     <div className="col-md-12">
                         <h1>Chat room {this.props.roomId}</h1>
@@ -168,7 +171,7 @@ class ChatRoom extends React.Component {
                         </div>
                         <div className="row">
                             <div className="col-md-12">
-                                <ChatInput onNewMessage={this.addMessage.bind(this)}/>
+                                <ChatInput onNewMessage={this.addMessage}/>
                             </div>
                         </div>
                     </div>
