@@ -94,15 +94,10 @@ class ChatInput extends React.Component {
 
 class ChatRoom extends React.Component {
 
-    static propTypes = {
-        username: React.PropTypes.string.isRequired,
-        roomId: React.PropTypes.string.isRequired
-    };
-
     constructor(props) {
         super(props);
         this.userActivityTimestamp = new Date().getTime();
-        this.state = { users: [], messages: [], userStatus: 'online' };
+        this.state = { users: [], messages: [], userStatus: 'online', user: ChatStore.getCurrentUser() };
     }
 
     @autobind
@@ -150,7 +145,8 @@ class ChatRoom extends React.Component {
     _onChange() {
         this.setState({
             users: ChatStore.getUsers(),
-            messages: ChatStore.getMessages()
+            messages: ChatStore.getMessages(),
+            user: ChatStore.getCurrentUser()
         });
     }
 
@@ -159,7 +155,7 @@ class ChatRoom extends React.Component {
             <div className="row" onMouseMove={this.trackUserActivity} onKeyPress={this.trackUserActivity}>
                 <div className="row chatRoomHeader">
                     <div className="col-md-12">
-                        <h1>Chat room {this.props.roomId}</h1>
+                        <h1>Chat room {this.props.params.roomId}</h1>
                     </div>
                 </div>
                 <div className="row">
@@ -176,7 +172,7 @@ class ChatRoom extends React.Component {
                         </div>
                     </div>
                     <div className="col-md-4">
-                        <UserList users={this.state.users} currentUser={this.props.username}/>
+                        <UserList users={this.state.users} currentUser={this.state.user}/>
                     </div>
                 </div>
             </div>

@@ -1,7 +1,8 @@
 
-import Router from './Router';
+import ReactDOM from 'react-dom';
+import AppRouter from './AppRouter';
 
 document.addEventListener('DOMContentLoaded', () => {
-    Router('content').navigateToHome(window.location.pathname);
+    ReactDOM.render(AppRouter, document.getElementById('content'));
 });
 
