@@ -5,12 +5,15 @@ import models.RoomId
 import models.events.{OutEvent, InEvent}
 import play.api.libs.json.Json
 import play.api.mvc._
+import play.api.mvc.WebSocket.MessageFlowTransformer
 import play.api.Play.current
+import play.api.Play.materializer
 import services.ChatSystem
 
-object Application extends Controller {
+class Application extends Controller {
 
   import play.api.libs.concurrent.Execution.Implicits._
+  implicit val flowTranformer = MessageFlowTransformer.jsonMessageFlowTransformer[InEvent, OutEvent]
 
   val chatSystem = ChatSystem.defaultSystem
 

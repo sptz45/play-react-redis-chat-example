@@ -4,7 +4,6 @@ package events {
 
   import julienrf.variants.Variants
   import play.api.libs.json._
-  import play.api.mvc.WebSocket.FrameFormatter
   import scredis.serialization.{UTF8StringWriter, Writer}
 
   sealed  trait InEvent
@@ -16,7 +15,6 @@ package events {
 
   object InEvent {
     implicit val jsonFormatter: Format[InEvent] = Variants.format[InEvent]((__ \ "event").format[String])
-    implicit val frameFormatter = FrameFormatter.jsonFrame[InEvent]
   }
 
   sealed trait OutEvent
@@ -28,8 +26,6 @@ package events {
   object OutEvent {
 
     implicit val jsonFormatter: Format[OutEvent] = Variants.format[OutEvent]((__ \ "event").format[String])
-
-    implicit val frameFormatter = FrameFormatter.jsonFrame[OutEvent]
 
     implicit val redisWriter: Writer[OutEvent] = new Writer[OutEvent] {
       protected def writeImpl(value: OutEvent): Array[Byte] = {
