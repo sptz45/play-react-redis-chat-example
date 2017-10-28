@@ -1,6 +1,6 @@
 package controllers
 
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 
 import actors.{ChatActor, ChatRoomRegistry}
 import akka.actor.ActorSystem
@@ -15,6 +15,7 @@ import play.api.mvc.WebSocket.MessageFlowTransformer
 import play.api.libs.streams.ActorFlow
 import services.ChatSystem
 
+@Singleton
 class Application @Inject() (implicit actorSystem: ActorSystem, mat: Materializer) extends InjectedController {
 
   import play.api.libs.concurrent.Execution.Implicits._
