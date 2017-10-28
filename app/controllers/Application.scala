@@ -7,18 +7,20 @@ import akka.actor.ActorSystem
 import akka.stream.Materializer
 import models.RoomId
 import models.events.{InEvent, OutEvent}
-import play.api.Play
-import play.api.libs.concurrent.Akka
 import play.api.libs.json.Json
-import play.api.mvc._
-import play.api.mvc.WebSocket.MessageFlowTransformer
 import play.api.libs.streams.ActorFlow
+import play.api.mvc.WebSocket.MessageFlowTransformer
+import play.api.mvc._
 import services.ChatSystem
 
-@Singleton
-class Application @Inject() (implicit actorSystem: ActorSystem, mat: Materializer) extends InjectedController {
+import scala.concurrent.ExecutionContext
 
-  import play.api.libs.concurrent.Execution.Implicits._
+@Singleton
+class Application @Inject() (implicit
+  ec: ExecutionContext,
+  actorSystem: ActorSystem,
+  mat: Materializer) extends InjectedController {
+
   private implicit val flowTransformer: MessageFlowTransformer[InEvent, OutEvent] =
     MessageFlowTransformer.jsonMessageFlowTransformer[InEvent, OutEvent]
 

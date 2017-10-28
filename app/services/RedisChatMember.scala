@@ -1,8 +1,10 @@
 package services
 
-import models.{User, UserStatus, RoomId, Message}
-import models.events.{MemberStatusUpdate, MemberLeft, OutEvent, NewMessages}
-import scredis.{Score, Redis}
+import models.{Message, RoomId, User, UserStatus}
+import models.events.{MemberLeft, MemberStatusUpdate, NewMessages, OutEvent}
+import scredis.{Redis, Score}
+
+import scala.util.{Failure, Success}
 
 
 class RedisChatMember(redis: Redis, user: String, roomId: RoomId) extends ChatRoomMember {
@@ -27,10 +29,11 @@ class RedisChatMember(redis: Redis, user: String, roomId: RoomId) extends ChatRo
   def goOffline(): Unit = {
     import redis.dispatcher
     redis.hSet(roomId.usersStatusKey, user, UserStatus.Offline)
-    redis.hGet(roomId.usersAccessKey, user).onSuccess {
-      case Some(accessTime) =>
+    redis.hGet(roomId.usersAccessKey, user).onComplete {
+      case Success(Some(accessTime)) =>
         val updatedUser = User(user, accessTime.toLong, UserStatus.Offline)
         redis.publish(roomId.channelKey, MemberStatusUpdate(updatedUser): OutEvent)
+      case _ => ()
     }
   }
 
