@@ -1,21 +1,28 @@
 package controllers
 
-import actors.ChatActor
+import javax.inject.Inject
+
+import actors.{ChatActor, ChatRoomRegistry}
+import akka.actor.ActorSystem
+import akka.stream.Materializer
 import models.RoomId
-import models.events.{OutEvent, InEvent}
+import models.events.{InEvent, OutEvent}
+import play.api.Play
+import play.api.libs.concurrent.Akka
 import play.api.libs.json.Json
 import play.api.mvc._
 import play.api.mvc.WebSocket.MessageFlowTransformer
-import play.api.Play.current
-import play.api.Play.materializer
+import play.api.libs.streams.ActorFlow
 import services.ChatSystem
 
-class Application extends Controller {
+class Application @Inject() (implicit actorSystem: ActorSystem, mat: Materializer) extends InjectedController {
 
   import play.api.libs.concurrent.Execution.Implicits._
-  implicit val flowTranformer = MessageFlowTransformer.jsonMessageFlowTransformer[InEvent, OutEvent]
+  private implicit val flowTransformer: MessageFlowTransformer[InEvent, OutEvent] =
+    MessageFlowTransformer.jsonMessageFlowTransformer[InEvent, OutEvent]
 
-  val chatSystem = ChatSystem.defaultSystem
+  private val chatSystem = ChatSystem.defaultSystem
+  private lazy val registry = actorSystem.actorOf(ChatRoomRegistry.props)
 
   def index = Action(Ok(views.html.index()))
 
@@ -31,8 +38,11 @@ class Application extends Controller {
     Ok(Json.obj("roomId" -> roomId.id))
   }
 
-  def chat(chatRoom: String, user: String) = WebSocket.acceptWithActor[InEvent, OutEvent] {
-    request => out =>
-      ChatActor.props(out, chatSystem, RoomId(chatRoom), user)
+  def chat(chatRoom: String, user: String) = {
+    WebSocket.accept[InEvent, OutEvent] { request =>
+      ActorFlow.actorRef { out =>
+        ChatActor.props(out, registry, chatSystem, RoomId(chatRoom), user)
+      }
+    }
   }
 }

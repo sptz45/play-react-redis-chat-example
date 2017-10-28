@@ -28,7 +28,5 @@ class ChatRoomRegistry extends Actor {
 
 object ChatRoomRegistry {
 
-  private val actor = Akka.system.actorOf(Props(new ChatRoomRegistry))
-
-  def apply(): ActorRef = actor
+  def props = Props(new ChatRoomRegistry)
 }

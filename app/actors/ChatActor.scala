@@ -8,6 +8,7 @@ import services.{ChatRoomMembershipManager, ChatRoomMember}
 
 class ChatActor(
   out: ActorRef,
+  registry: ActorRef,
   membershipManager: ChatRoomMembershipManager,
   roomId: RoomId,
   user: String) extends Actor {
@@ -35,7 +36,7 @@ class ChatActor(
 
   private val waitingJoin: Receive = {
     case JoinGroup =>
-      ChatRoomRegistry() ! JoinRequest(roomId)
+      registry ! JoinRequest(roomId)
     case JoinConfirmed =>
       val membership = membershipManager.join(roomId, user)
       member = membership.member
@@ -54,6 +55,6 @@ class ChatActor(
 }
 
 object ChatActor {
-  def props(out: ActorRef, membershipManager: ChatRoomMembershipManager, roomId: RoomId, user: String) =
-    Props(new ChatActor(out, membershipManager, roomId, user))
+  def props(out: ActorRef, registry: ActorRef, membershipManager: ChatRoomMembershipManager, roomId: RoomId, user: String) =
+    Props(new ChatActor(out, registry: ActorRef, membershipManager, roomId, user))
 }

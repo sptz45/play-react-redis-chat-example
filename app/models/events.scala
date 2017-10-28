@@ -2,7 +2,7 @@ package models
 
 package events {
 
-  import julienrf.variants.Variants
+  import julienrf.json.derived
   import play.api.libs.json._
   import scredis.serialization.{UTF8StringWriter, Writer}
 
@@ -14,7 +14,8 @@ package events {
   case class UserWentAway(lastAccessTime: Long) extends InEvent
 
   object InEvent {
-    implicit val jsonFormatter: Format[InEvent] = Variants.format[InEvent]((__ \ "event").format[String])
+    implicit val jsonFormatter: Format[InEvent] =
+      derived.flat.oformat((__ \ "event").format[String])
   }
 
   sealed trait OutEvent
@@ -25,7 +26,7 @@ package events {
 
   object OutEvent {
 
-    implicit val jsonFormatter: Format[OutEvent] = Variants.format[OutEvent]((__ \ "event").format[String])
+    implicit val jsonFormatter: Format[OutEvent] = derived.flat.oformat((__ \ "event").format[String])
 
     implicit val redisWriter: Writer[OutEvent] = new Writer[OutEvent] {
       protected def writeImpl(value: OutEvent): Array[Byte] = {
