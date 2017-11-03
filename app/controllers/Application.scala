@@ -1,9 +1,9 @@
 package controllers
 
-import javax.inject.{Inject, Singleton}
+import javax.inject.{Inject, Named, Singleton}
 
-import actors.{ChatActor, ChatRoomRegistry}
-import akka.actor.ActorSystem
+import actors.ChatActor
+import akka.actor.{ActorRef, ActorSystem}
 import akka.stream.Materializer
 import models.RoomId
 import models.events.{InEvent, OutEvent}
@@ -16,16 +16,13 @@ import services.ChatSystem
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class Application @Inject() (implicit
-  ec: ExecutionContext,
+class Application @Inject() (chatSystem: ChatSystem, @Named("roomRegistry") registry: ActorRef)
+  (implicit ec: ExecutionContext,
   actorSystem: ActorSystem,
   mat: Materializer) extends InjectedController {
 
   private implicit val flowTransformer: MessageFlowTransformer[InEvent, OutEvent] =
     MessageFlowTransformer.jsonMessageFlowTransformer[InEvent, OutEvent]
-
-  private val chatSystem = ChatSystem.defaultSystem
-  private lazy val registry = actorSystem.actorOf(ChatRoomRegistry.props)
 
   def index = Action(Ok(views.html.index()))
 
@@ -42,7 +39,7 @@ class Application @Inject() (implicit
   }
 
   def chat(chatRoom: String, user: String) = {
-    WebSocket.accept[InEvent, OutEvent] { request =>
+    WebSocket.accept[InEvent, OutEvent] { _ =>
       ActorFlow.actorRef { out =>
         ChatActor.props(out, registry, chatSystem, RoomId(chatRoom), user)
       }

@@ -1,18 +1,17 @@
 package actors
 
+import javax.inject.Inject
+
 import akka.actor._
 import models.RoomId
 import models.events.JoinRequest
-import play.api.libs.concurrent.Akka
-import play.api.Play.current
 import services.ChatSystem
 
 import scala.collection.mutable
 
 
-class ChatRoomRegistry extends Actor {
+class ChatRoomRegistry @Inject() (chatSystem: ChatSystem) extends Actor {
 
-  private val chatSystem = ChatSystem.defaultSystem
   private val chatRoomActors = mutable.HashMap[RoomId, ActorRef]()
 
   def receive: Receive = {
@@ -24,9 +23,4 @@ class ChatRoomRegistry extends Actor {
   private def newChatRoomActor(roomId: RoomId) = {
     context.actorOf(ChatRoomBroadcaster.props(chatSystem, roomId), name = roomId.id)
   }
-}
-
-object ChatRoomRegistry {
-
-  def props = Props(new ChatRoomRegistry)
 }

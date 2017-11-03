@@ -4,7 +4,7 @@ import akka.actor._
 import akka.pattern.pipe
 import models.RoomId
 import models.events._
-import services.{ChatRoomMembershipManager, ChatRoomMember}
+import services.{ChatRoomMember, ChatRoomMembershipManager}
 
 class ChatActor(
   out: ActorRef,
@@ -49,12 +49,13 @@ class ChatActor(
 
   def receive: Receive = waitingJoin
 
-  override def postStop(): Unit = {
-    member.goOffline()
-  }
+  override def postStop(): Unit =
+    if (member != null)
+      member.goOffline()
+
 }
 
 object ChatActor {
   def props(out: ActorRef, registry: ActorRef, membershipManager: ChatRoomMembershipManager, roomId: RoomId, user: String) =
-    Props(new ChatActor(out, registry: ActorRef, membershipManager, roomId, user))
+    Props(new ChatActor(out, registry, membershipManager, roomId, user))
 }

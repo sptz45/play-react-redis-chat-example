@@ -37,8 +37,3 @@ trait ChatRoomMember {
 trait ChatRoom {
   def history: Seq[Future[OutEvent]]
 }
-
-object ChatSystem {
-  def defaultSystem: ChatSystem = new RedisChatSystem(new Redis)
-}
-
